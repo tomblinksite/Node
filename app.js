@@ -8,10 +8,10 @@ var express = require('express'),
 var app = express();
 var server = http.createServer(app);
 var sockets = io.listen(server);
-var watchSymbols = ['#yorkshire', '#Leeds', '#Sheffield', '#york', '#UK', '#England', '#huddersfield'];
+var watchSymbols = ['#yorkshire', '#Leeds', '#Sheffield', '#york', '#UK', '#England','#huddersfield','#harrogate','#hull','#ripon','#Northern'];
 var watchList = {
 	total:0,
-	symbols: {}
+	symbols: []
 };
 
 
@@ -20,7 +20,8 @@ app.set('port', process.env.PORT || 8080);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(express.logger('dev'));
-app.use(express.bodyParser());
+app.use(express.json());
+app.use(express.urlencoded());
 app.use(express.methodOverride());
 app.use(app.router);
 app.use(require('stylus').middleware(__dirname + '/public'));
@@ -30,9 +31,8 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 app.get('/', function(request, response) {
-	response.render('page',{data:watchList});
+	response.render('index.html',{data:watchList});
 });
-
 
 
 
@@ -71,25 +71,24 @@ t.stream('statuses/filter', { track: watchSymbols}, function(stream) {
 			var claimed = false;
 			
 			if(checkCoords(tweet) == 1) {
-				console.log('FOUND TWEET');
+				console.log('FOUND TWEET '+tweet.text);
+				if(tweet.text !== undefined) {
+					var text = tweet.text.toLowerCase();
+					
+					_.each(watchSymbols, function(v) {
+				          if (text.indexOf(v.toLowerCase()) !== -1) {
+				              watchList.symbols.push(tweet.geo.coordinates);
+				              claimed = true;
+				          }
+				      });
+				      
+				      if (claimed) {
+				          watchList.total++;
+				          sockets.sockets.emit('data', watchList);
+				      }
+				}
 			}
-			
-			/*if(tweet.text !== undefined) {
-				var text = tweet.text.toLowerCase();
-				
-				_.each(watchSymbols, function(v) {
-			          if (text.indexOf(v.toLowerCase()) !== -1) {
-			              watchList.symbols[v]++;
-			              claimed = true;
-			          }
-			      });
-			      
-			      if (claimed) {
-			          watchList.total++;
-			          sockets.sockets.emit('data', watchList);
-			      }
-			}*/
-		
+					
 		}
 		
 	});
