@@ -5,15 +5,16 @@ var express = require('express'),
 	cronJob = require('cron').CronJob,
 	_ = require('underscore'),
 	path = require('path');
+var gm = require('googlemaps');
+var util = require('util');
 var app = express();
 var server = http.createServer(app);
 var sockets = io.listen(server);
-var watchSymbols = ['#yorkshire', '#Leeds', '#Sheffield', '#york', '#UK', '#England','#huddersfield','#harrogate','#hull','#ripon','#Northern'];
+var watchSymbols = ['#yorkshire', '#Leeds', '#Sheffield', '#york', '#UK', '#England','#huddersfield','#harrogate','#hull','#ripon','#Northern','#christmas','#xmas'];
 var watchList = {
 	total:0,
 	symbols: []
 };
-
 
 
 app.set('port', process.env.PORT || 8080);
@@ -31,8 +32,9 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 app.get('/', function(request, response) {
-	response.render('index.html',{data:watchList});
+	response.render('page',{data:watchList});
 });
+
 
 
 

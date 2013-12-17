@@ -15,7 +15,7 @@
     "socket.io" :  "0.9.x",
     "stylus"   :  "0.41.x",
     "underscore" :  "1.5.x",
-    "google-maps" :  "1.0.x",
+    "googlemaps" :  "0.1.x",
     "mongodb" :  "1.3.x"
   },
   "scripts": {"start": "node app.js"}

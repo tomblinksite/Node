@@ -1,57 +1,104 @@
 $(function() {
+	var map;
+    var citymap = {};
+    var cityCircle;
+    var heatmapData = [];
     
-    var socket = io.connect(window.location.hostname);
+	var socket = io.connect(window.location.hostname);
     socket.on('data', function(data) {
         
         var total = data.total;
+        heatmapData = [];
         for (var i=0;i<data.symbols.length;i++) {
             var val = data.symbols[i];
-            $('#map').append(val+'<br/>');
+            //$('#content').append(val+'<br/>');
+           // heatmapData.push({location: new google.maps.LatLng(val[0], val[1]), weight: 0.5});
+           // setHeatMap();
+           heatmapData.push(val);
+           addCircles();
         }
      
     });
     
-        
     
-   /* var citymap = {};
-	citymap['chicago'] = {
-	  center: new google.maps.LatLng(41.878113, -87.629798),
-	  population: 100
-	};
-	citymap['amsterdam'] = {
-	  center: new google.maps.LatLng(52.878113, 5.629798),
-	  population: 40
-	};
-	citymap['paris'] = {
-	  center: new google.maps.LatLng(48.9021449, 2.4699208),
-	  population: 100
-	};
-	citymap['moscow'] = {
-	  center: new google.maps.LatLng(56.021369, 37.9650909),
-	  population: 100
-	};
-	citymap['newyork'] = {
-	  center: new google.maps.LatLng(40.9152414, -73.70027209999999),
-	  population: 80
-	};
-	citymap['losangeles'] = {
-	  center: new google.maps.LatLng(34.3373061, -118.1552891),
-	  population: 65
+    function initialize() {
+    	
+      var myOptions = {
+      center: new google.maps.LatLng(53.82320, -1.57702),
+      zoom: 8,
+      styles: [{
+            stylers: [{
+                visibility: "off"
+            }]
+        }, {
+            featureType: "water",
+            stylers: [{
+                visibility: "on"
+            }, {
+                color: "#bfbfbf"
+            }]
+        }, {
+            featureType: "landscape",
+            stylers: [{
+                visibility: "on"
+            }, {
+                color: "#e5e3df"
+            }]
+        }],
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      };
+       
+       map = new google.maps.Map(document.getElementById("map"), myOptions);
+              
+     }
+     window.onload= initialize;
+     
+     function addCircles() {
+     	
+	     for (var i = 0; i < heatmapData.length; i++) {
+		    var latLng = new google.maps.LatLng(heatmapData[i][0],heatmapData[i][1]);
+		    var marker = new google.maps.Marker({
+		      position: latLng,
+		      map: map,
+		      icon: getCircle(0.1)
+		    });
+		  }
+     }
+     
+     function getCircle(magnitude) {
+	  return {
+	    path: google.maps.SymbolPath.CIRCLE,
+	    fillColor: 'red',
+	    fillOpacity: .02,
+	    scale: 10,
+	    strokeColor: 'red',
+	    strokeWeight: .5
+	  };
 	}
-	
-	for (var city in citymap) {
-	    var populationOptions = {
-	        strokeColor: "#900057",
-	        strokeOpacity: 1,
-	        strokeWeight: 1,
-	        fillColor: "#900057",
-	        fillOpacity: 0.35,
-	        map: map,
-	        clickable: false,
-	        center: citymap[city].center,
-	        radius: citymap[city].population * 2000
+     
+     function setHeatMap() {
+	    var heatmap = new google.maps.visualization.HeatmapLayer({
+		  data: heatmapData,
+		  radius: 20
+		});
+		heatmap.setMap(map);
+     }
+     
+     function addCircle() {
+	   for (var city in citymap) {
+        var populationOptions = {
+	      strokeColor: '#FF0000',
+	      strokeOpacity: 0.8,
+	      strokeWeight: 2,
+	      fillColor: '#FF0000',
+	      fillOpacity: 0.35,
+	      map: map,
+	      center: citymap[city].center,
+	      radius: 2000
 	    };
 	    cityCircle = new google.maps.Circle(populationOptions);
-	}*/
-    
+	  }
+     }
+
+	
 })
