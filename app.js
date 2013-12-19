@@ -23,10 +23,12 @@ var t = new twitter ({
 
 var watchSymbols = ['#yorkshire', '#Leeds', '#Sheffield', '#york', '#UK', '#England','#huddersfield','#harrogate','#hull','#ripon','#Northern','#christmas','#xmas','#weather','#win'];
 
+
 var watchList = {
 	total:0,
 	symbols: []
 };
+
 
 var watchListNew = [];
 
