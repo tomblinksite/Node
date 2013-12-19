@@ -2,29 +2,19 @@ $(function() {
 	var map;
     var citymap = {};
     var cityCircle;
-  
     var heatmapData = [];
+    var coordsArray = [];
     
 	var socket = io.connect(window.location.hostname);
     socket.on('data', function(data) {
         
-        //heatmapData = [];
-        //heatmapData.push(val);
-       
-       
-        console.log(data);
-        if(data) {
-	         addSingleCircle(data);
-        }
-       
-        /*
-        var total = data.total;
-        for (var i=0;i<data.symbols.length;i++) {
-            var val = data.symbols[i];
-           heatmapData.push(val);
-           addCircles();
-        }*/
-     
+        
+        for (var p in data) {
+        	console.log(data[p]);
+        	addSingleCircle(data[p]);
+	    }
+
+            
     });
     
     
@@ -53,8 +43,8 @@ $(function() {
      window.onload= initialize;
      
      function addSingleCircle(coords) {
-	     
-	    var latLng = new google.maps.LatLng(coords[0],coords[1]);
+	    console.log(coords.longCord+' and '+coords.latCord);
+	    var latLng = new google.maps.LatLng(coords.longCord,coords.latCord);
 	    var marker = new google.maps.Marker({
 	      position: latLng,
 	      animation: google.maps.Animation.DROP,

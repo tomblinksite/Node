@@ -1,27 +1,40 @@
-var mongo = require('mongodb');
-var host = "localhost";
-var port = mongo.Connection.DEFAULT_PORT;
-var db = new mongo.Db('grandepart', new mongo.Server(host, port, {}), {});
+//var databaseUrl = "localhost:27017/pins";
+//var collections = ["pins"];
+//var db = require("mongojs").connect(databaseUrl, collections);
 
-db.createCollection("test", function(err, collection){
-    collection.insert({"test":"value"});
-});
 
-/*MongoClient.connect('mongodb://localhost:8080', function(err, db) {
-  if(err) throw err;
-  console.log("Connected to Database");
-})
+pinsProvider = function(databaseUrl, collections) {
+	this.db = require("mongojs").connect(databaseUrl, collections);
+};
 
-var mongo = require('mongodb');
-var host = "localhost";
-var port = mongo.Connection.DEFAULT_PORT;
-var db = new mongo.Db('node-mongo-examples', new mongo.Server(host, port, {}), {});
 
-db.open(function(err,db) {
-  db.collection('users', function(err,collection) {
-    collection.insert({username:'Bilbo',firstname:'Shilbo'}, function(err, docs) {
-      console.log(docs);
-      db.close();
-    });
+pinsProvider.prototype.findAll = function(callback) {
+	
+	this.db.pins.find().limit(10).sort({ time:-1 }, function(err, pins) {
+	  if( err || !pins) console.log("No pins found");
+	  console.log(pins);
+	  callback(null, pins)
+	  /*else pins.forEach( function(pin) {
+	    var cords = [];
+	    cords.push(pin.longCord);
+	    cords.push(pin.latCord);
+	    watchListNew.push(cords);
+	  });*/
+	});
+	
+};
+
+
+/*
+db.pins.find().limit(10).sort({ time:-1 }, function(err, pins) {
+  if( err || !pins) console.log("No pins found");
+  else pins.forEach( function(pin) {
+    var cords = [];
+    cords.push(pin.longCord);
+    cords.push(pin.latCord);
+    watchListNew.push(cords);
   });
-})*/
+});
+*/
+
+exports.pinsProvider = pinsProvider;
