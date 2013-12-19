@@ -12,6 +12,10 @@ var express = require('express'),
 	sockets = io.listen(server),
 	PinsProvider = require('./PinsProvider').PinsProvider;
 
+var coordID = 0;
+
+var pinsProvider = new PinsProvider('localhost:27017/pins', ["pins"]);
+
 
 var t = new twitter ({
 	consumer_key: 'sZYUfMsDlUMmRfwDPkhIw',
@@ -43,20 +47,29 @@ app.use(app.router);
 app.use(require('stylus').middleware(__dirname + '/public'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/components', express.static(path.join(__dirname, 'components')));
-
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-var pinsProvider = new PinsProvider('localhost:27017/pins', ["pins"]);
 
 app.get('/', function(request, response) {
 	
 	pinsProvider.findAll(function(error, pins){
 		watchListNew = pins;
+		console.log('Found: '+pins.length+' pins');
 	    response.render('page',{data:pins});
 	});
 
+});
+
+app.get('/delete', function(request, response) {
+
+	pinsProvider.deleteAll(function(error, pins){
+		watchListNew = pins;
+		console.log('Found: '+pins.length+' pins');
+	    response.render('delete',{data:pins});
+	});
+	
 });
 
 sockets.sockets.on('connection', function(socket) {
@@ -71,7 +84,7 @@ t.stream('statuses/filter', { track: watchSymbols}, function(stream) {
 						
 			var claimed = false;
 			
-			if(checkCoords(tweet) == 1) {
+			//if(checkCoords(tweet) == 1) {
 				
 				console.log('FOUND TWEET '+tweet.text);
 				
@@ -82,23 +95,33 @@ t.stream('statuses/filter', { track: watchSymbols}, function(stream) {
 				          if (text.indexOf(v.toLowerCase()) !== -1) {
 				            
 				            var newCoordOjb = {
-					             longCord: tweet.geo.coordinates[0],
-					             latCord: tweet.geo.coordinates[1]
+					            coordID: coordID,
+					            longCord: tweet.geo.coordinates[0],
+					            latCord: tweet.geo.coordinates[1]
 				            }
-				            
-				            pinsProvider.save(newCoordOjb, function( error, docs) {
+				           
+				            pinsProvider.update(newCoordOjb, function( error, coordObj) {
 						        watchListNew = [];
-						        watchListNew.push(newCoordOjb);
-						        claimed = true;
-						        watchList.total++;
+						        watchListNew.push(coordObj);
 						        sockets.sockets.emit('data', watchListNew);
+						        console.log('Updated coordID: '+coordObj.coordID);
+						        if(coordID>20) { coordID = 0; } else { coordID ++; }
 						    });
-				              
+						    
+						    /*
+						    pinsProvider.save(newCoordOjb, function( error, coordObj) {
+						        watchListNew = [];
+						        watchListNew.push(coordObj);
+						        sockets.sockets.emit('data', watchListNew);
+						        console.log('Saving coordID: '+coordObj.coordID);
+						        if(coordID>20) { coordID = 0; } else { coordID ++; }
+						    });
+						   */
 				          }
 				     });
 				      
 				}
-			}
+			//}
 					
 		}
 		

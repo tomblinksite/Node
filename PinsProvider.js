@@ -4,22 +4,40 @@ PinsProvider = function(databaseUrl, collections) {
 
 PinsProvider.prototype.findAll = function(callback) {
 	
-	this.db.pins.find().limit(10).sort({ time:-1 }, function(err, pins) {
-	  if( err || !pins) console.log("No pins found");
-	  callback(null, pins)
+	this.db.pins.find().sort({ time:-1 }, function(err, pins) {
+	  if( err ) console.log('ERROR: '+err);
+	  else callback(null, pins)
 	});
 	
 };
 
 PinsProvider.prototype.save = function(coords, callback) {
    
-   console.log('Saving this object: '+coords.longCord);
+   console.log('saving THIS RECORD: '+coords.coordID);
    
-   this.db.pins.save({longCord: coords.longCord, latCord: coords.latCord, live: "true"}, function(err, coords) {
-   		if( err || !coords ) console.log("Pin not saved");
-   		else callback(null, coords) console.log("Pin saved")
+   this.db.pins.save({coordID: coords.coordID, longCord: coords.longCord, latCord: coords.latCord, live: "false"}, function(err, coords) {
+   		if( err ) console.log('ERROR: '+err);
+   		else callback(null, coords)
     });
    
 };
+
+PinsProvider.prototype.update = function(coords, callback) {
+	
+	console.log('Updating THIS RECORD: '+coords.coordID);
+	
+	this.db.pins.update( { coordID: coords.coordID }, { longCord: coords.longCord, latCord: coords.latCord, live: "false" }, true, function(err, coords){
+		if( err ) console.log('ERROR: '+err);
+		else callback(null, coords); console.log('cords id: '+coords.coordID)
+	});
+
+};
+
+PinsProvider.prototype.deleteAll = function(callback) {
+	
+	this.db.pins.remove()
+	
+};
+
 
 exports.PinsProvider = PinsProvider;
