@@ -18,10 +18,10 @@ var pinsProvider = new PinsProvider('localhost:27017/pins', ["pins"]);
 
 
 var t = new twitter ({
-	consumer_key: 'sZYUfMsDlUMmRfwDPkhIw',
-    consumer_secret: 'tBxylNtEY39PJ2pzKJg563V8S8qs7QsdCd8x4Ic0',
-    access_token_key: '25178393-gONIDJnHioZmdRde8cr4TdP7RBaeaWQ1sSewDOJTa',
-    access_token_secret: 'TSF3xIMpbMkLr6q1mY9ygvxOaqM0Bbpyfe9Ih9Cfa7mpi'
+	consumer_key: '',
+    consumer_secret: '',
+    access_token_key: '',
+    access_token_secret: ''
 });
 
 
